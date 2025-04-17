@@ -1,0 +1,71 @@
+export const contentItems = [
+    {
+      id: 1,
+      title: "The Social Dilemma",
+      category: "Documentary",
+      image: "https://source.unsplash.com/400x300/?documentary",
+      section: "Videos",
+    },
+    {
+      id: 2,
+      title: "Atomic Habits",
+      category: "Book",
+      image: "https://source.unsplash.com/400x300/?book",
+      section: "Books",
+    },
+    {
+      id: 3,
+      title: "How to Start a Movement | Derek Sivers",
+      category: "TED Talk",
+      image: "https://source.unsplash.com/400x300/?tedtalk",
+      section: "TED Talks",
+    },
+    {
+      id: 4,
+      title: "The Power of Habit",
+      category: "Book",
+      image: "https://source.unsplash.com/400x300/?reading",
+      section: "Books",
+    },
+    {
+      id: 5,
+      title: "The True Cost",
+      category: "Documentary",
+      image: "https://source.unsplash.com/400x300/?movie",
+      section: "Videos",
+    },
+    {
+      id: 6,
+      title: "Greta Thunberg's Speech at UN",
+      category: "Speech",
+      image: "https://source.unsplash.com/400x300/?speech",
+    },
+    {
+      id: 7,
+      title: "The Hidden Cost of Fast Fashion",
+      category: "Article",
+      image: "https://source.unsplash.com/400x300/?article",
+    },
+    {
+      id: 8,
+      title: "The Future of Energy | Elon Musk",
+      category: "TED Talk",
+      image: "https://source.unsplash.com/400x300/?energy",
+      section: "TED Talks",
+    },
+    {
+      id: 9,
+      title: "Cowspiracy",
+      category: "Documentary",
+      image: "https://source.unsplash.com/400x300/?environment",
+      section: "Videos",
+    },
+    {
+      id: 10,
+      title: "Clean Energy Revolution",
+      category: "Report",
+      image: "https://source.unsplash.com/400x300/?report",
+      section: "Reports",
+    },
+  ];
+  

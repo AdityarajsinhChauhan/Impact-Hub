@@ -1,0 +1,12 @@
+/server/node_modules
+/client/node_modules
+/server/dist
+/client/dist
+/server/build
+/client/build
+/server/.env
+/client/.env
+/server/.env.local
+/client/.env.local
+/server/.env.development
+/client/.env.development
