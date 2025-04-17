@@ -9,8 +9,6 @@ import InteractiveMap from "./pages/InteractiveMap";
 import ActionHub from "./pages/ActionHub";
 import FindYourPassion from "./pages/FindYourPassion";
 import ContentLibrary from "./pages/ContentLibrary";
-import Login from "./pages/Login";
-import Signup from "./pages/SignUp";
 import Auth from "./pages/Auth";
 import CommunityChat from "./pages/CommunityChat";
 import PersonalChat from "./pages/PersonalChat";
@@ -141,8 +139,6 @@ function App() {
           {!hideNavbarFooter && <Navbar active={active} setactive={setactive} />}
           <Routes>
             <Route path="/auth" element={<Auth />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
             <Route
               path="/"
               element={<Home active={active} setactive={setactive} imagesLoaded={imagesLoaded} />}
