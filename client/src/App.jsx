@@ -26,7 +26,6 @@ function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Protected routes skip image preloading
   const isProtectedRoute =
     location.pathname.startsWith("/chat") ||
     location.pathname.startsWith("/personal-chat") ||
@@ -34,7 +33,6 @@ function App() {
 
   const shouldPreloadImages = !isProtectedRoute;
 
-  // Preload images only for non-protected routes
   useEffect(() => {
     if (!shouldPreloadImages) {
       setImagesLoaded(true);
@@ -56,7 +54,7 @@ function App() {
   
     let loadedImages = 0;
     const total = imagesToPreload.length;
-  
+
     const checkIfDone = () => {
       if (loadedImages === total) {
         setImagesLoaded(true);
@@ -67,7 +65,7 @@ function App() {
       console.warn("Image preloading timed out.");
       setImagesLoaded(true);
     }, 5000);
-  
+
     imagesToPreload.forEach((src) => {
       const img = new Image();
       img.src = src;
@@ -81,12 +79,15 @@ function App() {
         checkIfDone();
       };
     });
+
+    // Use window.onload to ensure all images are rendered in the DOM
+    window.onload = () => {
+      setImagesLoaded(true);
+    };
   
     return () => clearTimeout(timeout);
-  }, [location.pathname]); // 👈 this is the key
-  
+  }, [location.pathname]);
 
-  // Preloader visible until images & token are ready
   useEffect(() => {
     if (imagesLoaded && tokenLoaded) {
       const timeout = setTimeout(() => {
@@ -95,16 +96,13 @@ function App() {
       return () => clearTimeout(timeout);
     }
   }, [imagesLoaded, tokenLoaded, location.pathname]);
-  
 
-  // Get token from localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
     setTokenLoaded(true);
   }, []);
 
-  // Fetch user if token exists
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -123,12 +121,10 @@ function App() {
     }
   }, [token]);
 
-  // Navbar/Footer hiding logic
   const hideNavbarFooter = location.pathname === "/auth";
   const hideFooter =
     location.pathname.includes("/chat") ||
     location.pathname.includes("/personal-chat");
-  
 
   return (
     <>
