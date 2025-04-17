@@ -4,7 +4,7 @@ import axios from "../utils/axios";
 import { getUser } from "../api/user";
 import { useNavigate } from "react-router-dom";
 
-const InteractiveMap = ({ active, setactive }) => {
+const InteractiveMap = ({ active, setactive , activePersonalChat , setActivePersonalChat }) => {
 
   const [markers, setMarkers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -60,7 +60,8 @@ const InteractiveMap = ({ active, setactive }) => {
       email2: otherUserEmail,
     });
     const chatId = res.data._id;
-    navigate(`/personal-chat/${chatId}`);
+    setActivePersonalChat(chatId);
+    navigate("/personal-chat");
   };
 
   return (

@@ -160,7 +160,7 @@ function App() {
               path="/interactive-map"
               element={
                 user ? (
-                  <InteractiveMap active={active} setactive={setactive} />
+                  <InteractiveMap active={active} setactive={setactive} activePersonalChat={activePersonalChat} setActivePersonalChat={setActivePersonalChat} />
                 ) : (
                   <Navigate to="/auth" />
                 )

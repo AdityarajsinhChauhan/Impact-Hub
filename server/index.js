@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 // Routes
 import authRoutes from './routes/authRoutes.js';
@@ -27,6 +29,18 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
+
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: true,  // Ensure it's set for HTTPS
+    sameSite: 'None'  // Allow cross-origin cookies
+  }
+}));
+
 
 app.use(express.json());
 
