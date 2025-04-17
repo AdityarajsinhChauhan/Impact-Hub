@@ -15,7 +15,10 @@ const ContentLibrary = ({ active, setactive }) => {
         console.log(err);
       }
     };
-    fetchContent();
+    const token = localStorage.getItem("token");
+    if(token){
+      fetchContent();
+    }
   }, []);
   
   const [selectedCategory, setSelectedCategory] = useState("All");
