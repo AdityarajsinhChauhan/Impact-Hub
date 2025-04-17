@@ -22,6 +22,8 @@ function App() {
   const [tokenLoaded, setTokenLoaded] = useState(false);
   const [token, setToken] = useState(null);
   const [activePersonalChat, setActivePersonalChat] = useState(null);
+  const [userLoaded, setUserLoaded] = useState(false);
+
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -113,13 +115,18 @@ function App() {
         localStorage.removeItem("token");
         setToken(null);
         navigate("/auth");
+      } finally {
+        setUserLoaded(true); // ✅ Mark user check done
       }
     };
-
+  
     if (token) {
       fetchUser();
+    } else {
+      setUserLoaded(true); // ✅ No token, so skip fetch
     }
   }, [token]);
+  
 
   const hideNavbarFooter = location.pathname === "/auth";
   const hideFooter =
@@ -128,7 +135,7 @@ function App() {
 
   return (
     <>
-      {isLoading || !tokenLoaded ? (
+      {isLoading || !tokenLoaded || !userLoaded ? (
         <PreLoader />
       ) : (
         <>
@@ -142,7 +149,7 @@ function App() {
             <Route
               path="/chat/:discussionId"
               element={
-                token ? (
+                user ? (
                   <Chat active={active} setactive={setactive} user={user} setUser={setUser} setActivePersonalChat={setActivePersonalChat} activePersonalChat={activePersonalChat}/>
                 ) : (
                   <Navigate to="/auth" />
@@ -152,7 +159,7 @@ function App() {
             <Route
               path="/interactive-map"
               element={
-                token ? (
+                user ? (
                   <InteractiveMap active={active} setactive={setactive} />
                 ) : (
                   <Navigate to="/auth" />
@@ -162,13 +169,13 @@ function App() {
             <Route
               path="/action-hub"
               element={
-                token ? <ActionHub active={active} setactive={setactive} /> : <Navigate to="/auth" />
+                user ? <ActionHub active={active} setactive={setactive} /> : <Navigate to="/auth" />
               }
             />
             <Route
               path="/find-your-passion"
               element={
-                token ? (
+                user ? (
                   <FindYourPassion active={active} setactive={setactive} />
                 ) : (
                   <Navigate to="/auth" />
@@ -178,7 +185,7 @@ function App() {
             <Route
               path="/content-library"
               element={
-                token ? (
+                user ? (
                   <ContentLibrary active={active} setactive={setactive} />
                 ) : (
                   <Navigate to="/auth" />
@@ -188,7 +195,7 @@ function App() {
             <Route
               path="/community-chat"
               element={
-                token ? (
+                user ? (
                   <CommunityChat active={active} setactive={setactive} setActivePersonalChat={setActivePersonalChat} activePersonalChat={activePersonalChat} user={user} setUser={setUser}/>
                 ) : (
                   <Navigate to="/auth" />
@@ -198,7 +205,7 @@ function App() {
             <Route
               path="/personal-chat"
               element={
-                token ? (
+                user ? (
                   <PersonalChat active={active} setactive={setactive} user={user} setUser={setUser} activePersonalChat={activePersonalChat} setActivePersonalChat={setActivePersonalChat}/>
                 ) : (
                   <Navigate to="/auth" />
