@@ -113,6 +113,6 @@ io.on('connection', (socket) => {
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    server.listen(5000, () => console.log('Server running'));
+    server.listen(3000, () => console.log('Server running'));
   })
   .catch(err => console.log(err));
