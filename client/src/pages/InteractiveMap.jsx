@@ -3,12 +3,14 @@ import MapView from "../components/MapView";
 import axios from "../utils/axios";
 import { getUser } from "../api/user";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 const InteractiveMap = ({ active, setactive , activePersonalChat , setActivePersonalChat }) => {
 
   const [markers, setMarkers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +30,8 @@ const InteractiveMap = ({ active, setactive , activePersonalChat , setActivePers
       setMarkers(res.data);
     } catch (err) {
       console.error("Error fetching markers", err);
+    }finally {
+      setIsLoading(false); 
     }
   };
 
@@ -65,6 +69,8 @@ const InteractiveMap = ({ active, setactive , activePersonalChat , setActivePers
   };
 
   return (
+    <>
+    {isLoading ? (<Loader text="Loading markers..."/>) : (
     <div className="bg-gray-100 flex p-5 items-center">
       <div className="w-2/3">
         <MapView markers={markers} onMarkerClick={setSelectedUser} />
@@ -106,6 +112,8 @@ const InteractiveMap = ({ active, setactive , activePersonalChat , setActivePers
         </div>
       </div>
     </div>
+    )}
+    </>
   );
 };
 

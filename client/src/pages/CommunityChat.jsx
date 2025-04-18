@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getDiscussions, createDiscussion } from "../api/community";
 import { getUser, getUserByEmail } from "../api/user";
 import AddDiscussionForm from "../components/AddDiscussionForm";
+import Loader from "../components/Loader";
 
 const CommunityChat = ({
   active,
@@ -17,6 +18,7 @@ const CommunityChat = ({
   const [chatType, setchatType] = useState("discussion");
   const [showDiscussionForm, setShowDiscussionForm] = useState(false);
   const [allDiscussions, setAllDiscussions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [conversations, setConversations] = useState([]);
   const [userNameMap, setUserNameMap] = useState({});
@@ -25,52 +27,53 @@ const CommunityChat = ({
 
   useEffect(() => {
     setactive("community & chat");
+  }, []);
 
-    const fetchDiscussions = async () => {
-      try {
-        const discussionsResponse = await getDiscussions();
-        setAllDiscussions(discussionsResponse);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchDiscussions();
-  }, [showDiscussionForm]);
 
   useEffect(() => {
-    const getPersonalChats = async () => {
-      if (user?.email) {
-        const res = await axios.get(`/personalChat/${user.email}`);
-        setConversations(res.data);
-
-        const nameMap = {};
-
-        await Promise.all(
-          res.data.map(async (chat) => {
-            const otherEmail = chat.participants.find((p) => p !== user.email);
-            if (otherEmail && !nameMap[otherEmail]) {
-              try {
-                const userData = await getUserByEmail(otherEmail);
-                nameMap[otherEmail] = userData.name || otherEmail;
-              } catch (err) {
-                console.error(
-                  "Error fetching user for email:",
-                  otherEmail,
-                  err
-                );
-                nameMap[otherEmail] = otherEmail;
+    const fetchData = async () => {
+      setIsLoading(true);
+      setactive("community & chat");
+  
+      const nameMap = {};
+  
+      try {
+        // Fetch all discussions
+        const discussionsResponse = await getDiscussions();
+        setAllDiscussions(discussionsResponse);
+  
+        // Fetch personal chats
+        if (user?.email) {
+          const res = await axios.get(`/personalChat/${user.email}`);
+          setConversations(res.data);
+  
+          await Promise.all(
+            res.data.map(async (chat) => {
+              const otherEmail = chat.participants.find(p => p !== user.email);
+              if (otherEmail && !nameMap[otherEmail]) {
+                try {
+                  const userData = await getUserByEmail(otherEmail);
+                  nameMap[otherEmail] = userData.name || otherEmail;
+                } catch (err) {
+                  console.error("Error fetching user for email:", otherEmail, err);
+                  nameMap[otherEmail] = otherEmail;
+                }
               }
-            }
-          })
-        );
-
-        setUserNameMap({ ...nameMap }); // trigger re-render
+            })
+          );
+          setUserNameMap({ ...nameMap });
+        }
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-
-    getPersonalChats();
-  }, [user]);
+  
+    fetchData();
+  }, [user, showDiscussionForm]);
+  
   return (
     <div>
       {showDiscussionForm && (
@@ -80,6 +83,8 @@ const CommunityChat = ({
         />
       )}
 
+      {isLoading ? (<Loader text="Loading community chat..."/>) : (
+      <>
       <header className="relative w-screen mt-8 h-fit">
         <div className="absolute left-5 right-5 h-64 overflow-hidden rounded-2xl">
           <img
@@ -178,6 +183,8 @@ const CommunityChat = ({
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
 
     // <div className="bg-gray-100 px-10 pt-10">

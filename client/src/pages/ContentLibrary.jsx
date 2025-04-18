@@ -2,24 +2,30 @@ import React, { useEffect, useState } from "react";
 import SlidingNavbar from "../components/SlidingNavbar";
 import categoryColors from "../assets/contentLibraryColors";
 import { getContent, addContent } from "../api/content";
+import Loader from "../components/Loader";
 
 const ContentLibrary = ({ active, setactive }) => {
   const [content, setContent] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     setactive("content library");
     const fetchContent = async () => {
-      try{
+      try {
         const data = await getContent();
         setContent(data);
       } catch (err) {
         console.log(err);
+      } finally {
+        setIsLoading(false); 
       }
     };
+  
     const token = localStorage.getItem("token");
-    if(token){
+    if (token) {
       fetchContent();
     }
   }, []);
+  
   
   const [selectedCategory, setSelectedCategory] = useState("All");
   const filteredContent =
@@ -31,7 +37,8 @@ const ContentLibrary = ({ active, setactive }) => {
   return (
     <div className=" relative bg-gray-100">
       
-      <div className="flex">
+      {isLoading ? (<Loader text="Loading content..."/>) : (<>
+        <div className="flex">
         
         <div className="flex flex-col mt-5 w-full px-10">
         <h1 className="text-3xl text-emerald-500 font-bold ">Content Library</h1>
@@ -97,6 +104,8 @@ const ContentLibrary = ({ active, setactive }) => {
           </p>
         )}
       </div>
+      </>)} 
+      
     </div>
   );
 };

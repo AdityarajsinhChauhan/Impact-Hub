@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff } from "lucide-react";
 import {
@@ -22,8 +22,25 @@ const Auth = () => {
   const [showPasswordLogin, setShowPasswordLogin] = useState(false); // 👁️ Login password
   const [showPasswordSignup, setShowPasswordSignup] = useState(false); // 👁️ Signup password
   const [showConfirmPasswordSignup, setShowConfirmPasswordSignup] = useState(false); // 👁️ Confirm password
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for error parameters in the URL
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error");
+    if (error) {
+      if (error === "auth_failed") {
+        setErrorMessage("Authentication failed. Please try again.");
+      } else if (error === "google_auth_failed") {
+        setErrorMessage("Google authentication failed. Please try again.");
+      } else if (error === "server_error") {
+        setErrorMessage("Server error. Please try again later.");
+      }
+    }
+  }, [location]);
 
   const handleManualLogin = async () => {
     try {
@@ -31,7 +48,7 @@ const Auth = () => {
       localStorage.setItem("token", data.token);
       navigate("/");
     } catch (err) {
-      alert("Manual login failed");
+      setErrorMessage("Invalid email or password. Please try again.");
     }
   };
   
@@ -43,14 +60,18 @@ const Auth = () => {
       navigate("/");
     } catch (err) {
       console.log(err);
-      alert("Google sign-in failed");
+      setErrorMessage("Google sign-in failed. Please try again.");
     }
+  };
+
+  const handleGoogleOAuth = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google/start`;
   };
   
 
   const handleSignup = async () => {
     if (signupForm.password !== signupForm.confirmPassword) {
-      alert("Passwords don't match");
+      setErrorMessage("Passwords don't match");
       return;
     }
   
@@ -59,7 +80,7 @@ const Auth = () => {
       localStorage.setItem("token", data.token);
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.message || "Signup failed");
+      setErrorMessage(err.response?.data?.message || "Signup failed");
     }
   };
   
@@ -73,6 +94,21 @@ const Auth = () => {
         <span className="flex items-center justify-center text-gray-500">
           Connect, Learn, and Lead the Change
         </span>
+
+        {errorMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4 mx-6">
+            <span className="block sm:inline">{errorMessage}</span>
+            <span 
+              className="absolute top-0 right-0 px-4 py-3"
+              onClick={() => setErrorMessage("")}
+            >
+              <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <title>Close</title>
+                <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+              </svg>
+            </span>
+          </div>
+        )}
 
         <div className="relative flex w-full mt-5 bg-gray-100 p-1 rounded-md overflow-hidden">
           <div
@@ -144,8 +180,16 @@ const Auth = () => {
               OR CONTINUE WITH
             </span>
 
-            <div className="w-full">
+            <div className="w-full flex flex-col gap-3">
               <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => {}} />
+              
+              <button
+                onClick={handleGoogleOAuth}
+                className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-2 px-4 hover:bg-gray-50"
+              >
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                <span>Sign in with Google (OAuth)</span>
+              </button>
             </div>
             <p className="text-sm mb-6">
               Don't have an account?{" "}
@@ -244,8 +288,16 @@ const Auth = () => {
               OR CONTINUE WITH
             </span>
 
-            <div className="w-full">
+            <div className="w-full flex flex-col gap-3">
               <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => {}} />
+              
+              <button
+                onClick={handleGoogleOAuth}
+                className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-2 px-4 hover:bg-gray-50"
+              >
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                <span>Sign in with Google (OAuth)</span>
+              </button>
             </div>
 
             <p className="text-sm mb-6">

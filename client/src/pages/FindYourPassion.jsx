@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import quizQuestions from "../assets/quizData";
 import resultsData from "../assets/resultData";
 import { fetchPassion, addPassion } from "../api/passion";
+import Loader from "../components/Loader";
 
 const FindYourPassion = ({ active, setactive }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -9,6 +10,7 @@ const FindYourPassion = ({ active, setactive }) => {
   const [answers, setAnswers] = useState([]);
   const [result, setResult] = useState(null);
   const [quizComplete, setQuizComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const totalQuestions = quizQuestions.length;
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
@@ -24,6 +26,7 @@ const FindYourPassion = ({ active, setactive }) => {
         setResult(resultsData[res]);
         setQuizComplete(true);
       }
+      setIsLoading(false);
     };
 
     fetchUserPassion();
@@ -82,6 +85,8 @@ const FindYourPassion = ({ active, setactive }) => {
 
   return (
     <div className="bg-gray-100 pt-4 pb-10">
+      {isLoading ? (<Loader text="Loading quiz..."/>) : (
+      <>
       <h1 className="flex justify-center items-center w-full text-4xl mt-10 mb-10 font-bold ">
         Discover Your Passion: Take the Quiz!
       </h1>
@@ -182,6 +187,8 @@ const FindYourPassion = ({ active, setactive }) => {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

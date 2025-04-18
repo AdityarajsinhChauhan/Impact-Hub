@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import SlidingNavbar from "../components/SlidingNavbar";
 import AddOpportunityForm from "../components/AddOpportunityForm";
 import { getOpportunities } from "../api/opportunity";
+import Loader from "../components/Loader";
 
 const ActionHub = ({ active, setactive }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showForm, setShowForm] = useState(false);
   const [opportunities, setOpportunities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     setactive("action hub");
   }, []);
@@ -18,6 +20,8 @@ const ActionHub = ({ active, setactive }) => {
         console.log(response);
       } catch (err) {
         console.log(err);
+      }finally {
+        setIsLoading(false); 
       }
     };
     fetchOpportunities();
@@ -45,7 +49,9 @@ const ActionHub = ({ active, setactive }) => {
         <AddOpportunityForm showForm={showForm} setShowForm={setShowForm} />
       )}
 
-      <div className="flex w-full justify-between">
+      {isLoading ? (<Loader text="Loading opportunities..."/>) : (
+        <>
+        <div className="flex w-full justify-between">
         <div>
           <h1 className="text-3xl font-bold pt-5 pl-8">Action Hub</h1>
           <div className="text-gray-600 mt-3 pl-8">
@@ -124,6 +130,8 @@ const ActionHub = ({ active, setactive }) => {
           ))}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

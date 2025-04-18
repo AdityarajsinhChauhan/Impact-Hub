@@ -6,6 +6,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import passport from 'passport';
 
 // Routes
 import authRoutes from './routes/authRoutes.js';
@@ -36,11 +37,14 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: true,  // Ensure it's set for HTTPS
-    sameSite: 'None'  // Allow cross-origin cookies
+    secure: process.env.NODE_ENV === 'production',  // Only true in production
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax'  // Allow cross-origin cookies in production
   }
 }));
 
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json());
 

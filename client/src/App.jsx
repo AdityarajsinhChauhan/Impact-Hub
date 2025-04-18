@@ -10,6 +10,7 @@ import ActionHub from "./pages/ActionHub";
 import FindYourPassion from "./pages/FindYourPassion";
 import ContentLibrary from "./pages/ContentLibrary";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import CommunityChat from "./pages/CommunityChat";
 import PersonalChat from "./pages/PersonalChat";
 import { getUser } from "./api/user";
@@ -128,7 +129,7 @@ function App() {
   }, [token]);
   
 
-  const hideNavbarFooter = location.pathname === "/auth";
+  const hideNavbarFooter = location.pathname === "/auth" || location.pathname === "/auth/callback";
   const hideFooter =
     location.pathname.includes("/chat") ||
     location.pathname.includes("/personal-chat");
@@ -142,6 +143,7 @@ function App() {
           {!hideNavbarFooter && <Navbar active={active} setactive={setactive} />}
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route
               path="/"
               element={<Home active={active} setactive={setactive} imagesLoaded={imagesLoaded} />}

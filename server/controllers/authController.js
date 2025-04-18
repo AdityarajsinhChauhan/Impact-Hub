@@ -2,6 +2,9 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import { OAuth2Client } from 'google-auth-library';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -46,6 +49,39 @@ export const googleLogin = async (req, res) => {
 
   const token = generateToken(user);
   res.json({ token, user });
+};
+
+export const googleOAuthCallback = async (req, res) => {
+  try {
+    if (!req.user) {
+      console.error('No user data in Google OAuth callback');
+      return res.redirect(`${process.env.FRONTEND_URL}/auth?error=auth_failed`);
+    }
+
+    const { email, name, googleId } = req.user;
+    
+    console.log(`Google OAuth success for email: ${email}`);
+    
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({ email, name, googleId });
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    const token = generateToken(user);
+    
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    console.log(`Redirecting to: ${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+    return res.redirect(302, `${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+  } catch (error) {
+    console.error('Google OAuth callback error:', error);
+    return res.redirect(`${process.env.FRONTEND_URL}/auth?error=server_error`);
+  }
 };
 
 export const protectedRoute = (req, res) => {
