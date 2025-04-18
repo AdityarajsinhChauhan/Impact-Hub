@@ -45,8 +45,17 @@ const Auth = () => {
   const handleManualLogin = async () => {
     try {
       const data = await manualLogin(loginForm);
+      
+      // Set token in localStorage
       localStorage.setItem("token", data.token);
-      navigate("/");
+      
+      // Mark this as a fresh login
+      sessionStorage.setItem("freshLogin", "true");
+      
+      // Add a delay before navigating to ensure token is properly saved
+      setTimeout(() => {
+        navigate("/");
+      }, 300);
     } catch (err) {
       setErrorMessage("Invalid email or password. Please try again.");
     }
@@ -56,8 +65,17 @@ const Auth = () => {
   const handleGoogleSuccess = async (credResponse) => {
     try {
       const data = await googleLogin(credResponse.credential);
+      
+      // Set token in localStorage
       localStorage.setItem("token", data.token);
-      navigate("/");
+      
+      // Mark this as a fresh login
+      sessionStorage.setItem("freshLogin", "true");
+      
+      // Add a delay before navigating
+      setTimeout(() => {
+        navigate("/");
+      }, 300);
     } catch (err) {
       console.log(err);
       setErrorMessage("Google sign-in failed. Please try again.");
@@ -77,8 +95,17 @@ const Auth = () => {
   
     try {
       const data = await signup(signupForm);
+      
+      // Set token in localStorage
       localStorage.setItem("token", data.token);
-      navigate("/");
+      
+      // Mark this as a fresh login
+      sessionStorage.setItem("freshLogin", "true");
+      
+      // Add a delay before navigating
+      setTimeout(() => {
+        navigate("/");
+      }, 300);
     } catch (err) {
       setErrorMessage(err.response?.data?.message || "Signup failed");
     }
@@ -171,7 +198,7 @@ const Auth = () => {
             </div>
 
             <button
-              className="w-full bg-emerald-500 text-white rounded-full py-2 transition-all duration-300 hover:bg-black font-medium"
+              className="w-full bg-emerald-500 text-white rounded-lg py-2 transition-all duration-300 hover:bg-black font-medium"
               onClick={handleManualLogin}
             >
               Login
@@ -180,16 +207,10 @@ const Auth = () => {
               OR CONTINUE WITH
             </span>
 
-            <div className="w-full flex flex-col gap-3">
+            <div className="w-full flex rounded-lg flex-col gap-3">
               <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => {}} />
               
-              <button
-                onClick={handleGoogleOAuth}
-                className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-2 px-4 hover:bg-gray-50"
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                <span>Sign in with Google (OAuth)</span>
-              </button>
+             
             </div>
             <p className="text-sm mb-6">
               Don't have an account?{" "}
@@ -288,16 +309,10 @@ const Auth = () => {
               OR CONTINUE WITH
             </span>
 
-            <div className="w-full flex flex-col gap-3">
+            <div className="w-full flex rounded-lg flex-col gap-3">
               <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => {}} />
               
-              <button
-                onClick={handleGoogleOAuth}
-                className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-2 px-4 hover:bg-gray-50"
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                <span>Sign in with Google (OAuth)</span>
-              </button>
+              
             </div>
 
             <p className="text-sm mb-6">

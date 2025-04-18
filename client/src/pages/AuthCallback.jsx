@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from "../utils/axios";
 
 const AuthCallback = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [status, setStatus] = useState("Processing authentication...");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,14 +23,31 @@ const AuthCallback = () => {
           return;
         }
 
-        console.log("Token received in callback:", token);
+        console.log("Token received in callback:", token ? "Token received" : "No token");
         
         // Store the token in localStorage
         localStorage.setItem("token", token);
         
-        // Redirect to home page
-        console.log("Redirecting to home page...");
-        navigate("/");
+        // Mark this as a fresh login
+        sessionStorage.setItem("freshLogin", "true");
+        
+        console.log("Token stored in localStorage");
+        
+        // Verify token is accessible from localStorage
+        const storedToken = localStorage.getItem("token");
+        if (!storedToken) {
+          console.error("Token not properly stored in localStorage");
+          setError("Authentication failed. Token storage issue.");
+          setLoading(false);
+          return;
+        }
+        
+        setStatus("Token stored, confirming authentication...");
+        
+        // Use window.location.href for a more reliable redirect in case of token issues
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1000);
       } catch (err) {
         console.error("Auth callback error:", err);
         setError("Authentication failed. Please try again.");
@@ -60,7 +79,7 @@ const AuthCallback = () => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-emerald-50">
       <div className="bg-white p-8 rounded-lg shadow-lg text-center">
         <h1 className="text-2xl font-bold text-emerald-500 mb-4">Authentication Successful</h1>
-        <p className="mb-4">Redirecting you to the dashboard...</p>
+        <p className="mb-4">{status}</p>
         <div className="w-12 h-12 border-t-4 border-emerald-500 border-solid rounded-full animate-spin mx-auto"></div>
       </div>
     </div>

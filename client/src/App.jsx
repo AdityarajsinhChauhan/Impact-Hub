@@ -25,6 +25,7 @@ function App() {
   const [token, setToken] = useState(null);
   const [activePersonalChat, setActivePersonalChat] = useState(null);
   const [userLoaded, setUserLoaded] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
 
 
   const location = useLocation();
@@ -37,6 +38,62 @@ function App() {
 
   const shouldPreloadImages = !isProtectedRoute;
 
+  // Load token from localStorage
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    console.log("Token from localStorage:", storedToken ? "Found" : "Not found");
+    setToken(storedToken);
+    setTokenLoaded(true);
+  }, []);
+
+  // After token is loaded, fetch user with a slight delay
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        console.log("Fetching user data...");
+        // Check if this is a fresh login
+        const isFreshLogin = sessionStorage.getItem("freshLogin") === "true";
+        
+        if (isFreshLogin) {
+          // For fresh logins, use a longer delay to ensure token is properly registered
+          console.log("Fresh login detected - using longer delay before fetching user");
+          await new Promise(resolve => setTimeout(resolve, 1200));
+          sessionStorage.removeItem("freshLogin");
+        } else {
+          // For regular app loading, use a shorter delay
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        const res = await getUser();
+        console.log("User data fetched successfully");
+        setUser(res);
+        setAuthReady(true);
+      } catch (err) {
+        console.error("User fetch failed", err);
+        localStorage.removeItem("token");
+        setToken(null);
+        setAuthReady(true);
+        
+        // Only navigate to auth if not already there
+        if (!location.pathname.includes('/auth')) {
+          navigate("/auth");
+        }
+      } finally {
+        setUserLoaded(true);
+      }
+    };
+  
+    if (tokenLoaded) {
+      if (token) {
+        fetchUser();
+      } else {
+        setUserLoaded(true);
+        setAuthReady(true);
+      }
+    }
+  }, [token, tokenLoaded, navigate, location.pathname]);
+
+  // Image preloading
   useEffect(() => {
     if (!shouldPreloadImages) {
       setImagesLoaded(true);
@@ -92,43 +149,23 @@ function App() {
     return () => clearTimeout(timeout);
   }, [location.pathname]);
 
+  // Hide loader when everything is ready
   useEffect(() => {
-    if (imagesLoaded && tokenLoaded) {
+    if (imagesLoaded && tokenLoaded && userLoaded) {
       const timeout = setTimeout(() => {
         setIsLoading(false);
       }, 300);
       return () => clearTimeout(timeout);
     }
-  }, [imagesLoaded, tokenLoaded, location.pathname]);
+  }, [imagesLoaded, tokenLoaded, userLoaded, location.pathname]);
 
+  // Handle login status change
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-    setTokenLoaded(true);
-  }, []);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await getUser();
-        setUser(res);
-      } catch (err) {
-        console.error("User fetch failed", err);
-        localStorage.removeItem("token");
-        setToken(null);
-        navigate("/auth");
-      } finally {
-        setUserLoaded(true); // ✅ Mark user check done
-      }
-    };
-  
-    if (token) {
-      fetchUser();
-    } else {
-      setUserLoaded(true); // ✅ No token, so skip fetch
+    // If we're on a protected route but auth isn't ready, show loading
+    if (isProtectedRoute && !authReady) {
+      setIsLoading(true);
     }
-  }, [token]);
-  
+  }, [isProtectedRoute, authReady, location.pathname]);
 
   const hideNavbarFooter = location.pathname === "/auth" || location.pathname === "/auth/callback";
   const hideFooter =
@@ -152,7 +189,7 @@ function App() {
             <Route
               path="/chat/:discussionId"
               element={
-                user ? (
+                authReady && user ? (
                   <Chat active={active} setactive={setactive} user={user} setUser={setUser} setActivePersonalChat={setActivePersonalChat} activePersonalChat={activePersonalChat}/>
                 ) : (
                   <Navigate to="/auth" />
@@ -162,7 +199,7 @@ function App() {
             <Route
               path="/interactive-map"
               element={
-                user ? (
+                authReady && user ? (
                   <InteractiveMap active={active} setactive={setactive} activePersonalChat={activePersonalChat} setActivePersonalChat={setActivePersonalChat} />
                 ) : (
                   <Navigate to="/auth" />
@@ -172,13 +209,13 @@ function App() {
             <Route
               path="/action-hub"
               element={
-                user ? <ActionHub active={active} setactive={setactive} /> : <Navigate to="/auth" />
+                authReady && user ? <ActionHub active={active} setactive={setactive} /> : <Navigate to="/auth" />
               }
             />
             <Route
               path="/find-your-passion"
               element={
-                user ? (
+                authReady && user ? (
                   <FindYourPassion active={active} setactive={setactive} />
                 ) : (
                   <Navigate to="/auth" />
@@ -188,7 +225,7 @@ function App() {
             <Route
               path="/content-library"
               element={
-                user ? (
+                authReady && user ? (
                   <ContentLibrary active={active} setactive={setactive} />
                 ) : (
                   <Navigate to="/auth" />
@@ -198,7 +235,7 @@ function App() {
             <Route
               path="/community-chat"
               element={
-                user ? (
+                authReady && user ? (
                   <CommunityChat active={active} setactive={setactive} setActivePersonalChat={setActivePersonalChat} activePersonalChat={activePersonalChat} user={user} setUser={setUser}/>
                 ) : (
                   <Navigate to="/auth" />
@@ -208,7 +245,7 @@ function App() {
             <Route
               path="/personal-chat"
               element={
-                user ? (
+                authReady && user ? (
                   <PersonalChat active={active} setactive={setactive} user={user} setUser={setUser} activePersonalChat={activePersonalChat} setActivePersonalChat={setActivePersonalChat}/>
                 ) : (
                   <Navigate to="/auth" />
@@ -218,7 +255,7 @@ function App() {
             <Route
               path="/profile"
               element={
-                user ? (
+                authReady && user ? (
                   <Profile user={user} />
                 ) : (
                   <Navigate to="/auth" />
