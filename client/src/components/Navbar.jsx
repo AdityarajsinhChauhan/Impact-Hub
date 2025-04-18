@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { navLinks } from "../assets/NavLinks";
 import NavMenu from "./NavMenu";
+import { UserCircle } from "lucide-react";
 
 const Navbar = ({ active, setactive }) => {
   const [showMenu, setshowMenu] = useState(false);
@@ -18,18 +19,11 @@ const Navbar = ({ active, setactive }) => {
       className={`w-[100vw]" bg-white h-[11vh] "
 `}
     >
-      <NavMenu showMenu={showMenu} setshowMenu={setshowMenu} />
+      <NavMenu showMenu={showMenu} setshowMenu={setshowMenu} token={token} handleLogout={handleLogout}/>
       {/* title */}
       <div className="flex justify-between">
         <div className="flex">
-          <img
-            onClick={() => {
-              setshowMenu(true);
-            }}
-            className="md:hidden my-5 ml-3 flex w-5 h-5"
-            src="/ui-images/hamburger.svg"
-            alt=""
-          />
+          
           <Link
             to="/"
             className="text-black text-lg md:text-2xl font-bold my-4 ml-3"
@@ -65,7 +59,7 @@ const Navbar = ({ active, setactive }) => {
 
         {/* auth buttons */}
 
-        <div className=" transition-all duration-300">
+        <div className="md:block hidden transition-all duration-300">
           {!token ? (
             <>
               <Link to="/auth">
@@ -82,14 +76,33 @@ const Navbar = ({ active, setactive }) => {
               </Link>
             </>
           ) : (
-            <button
-              onClick={handleLogout}
-              className=" my-4 py-1 px-3 mr-3 transition-all hover:text-red-500 hover:bg-transparent duration-300 border border-transparent hover:border-red-500 rounded-md bg-red-600 text-white  font-medium"
-            >
-              Logout
-            </button>
+            <div className="flex items-center">
+              <Link to="/profile">
+                <button
+                  onClick={() => setactive("profile")}
+                  className="flex items-center justify-center transition-all hover:text-emerald-500 hover:bg-transparent duration-300 border border-transparent hover:border-emerald-500 rounded-md bg-emerald-500 text-white font-medium my-4 py-1 px-3 mr-2"
+                >
+                  <UserCircle className="mr-2" size={18} />
+                  Profile
+                </button>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="transition-all hover:text-red-500 hover:bg-transparent duration-300 border border-transparent hover:border-red-500 rounded-md bg-black text-white font-medium my-4 py-1 px-3 mr-3"
+              >
+                Logout
+              </button>
+            </div>
           )}
         </div>
+        <img
+            onClick={() => {
+              setshowMenu(true);
+            }}
+            className="md:hidden my-5 mx-3 flex w-5 h-5"
+            src="/ui-images/hamburger.svg"
+            alt=""
+          />
       </div>
     </div>
   );

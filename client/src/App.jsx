@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import CommunityChat from "./pages/CommunityChat";
 import PersonalChat from "./pages/PersonalChat";
+import Profile from "./pages/Profile";
 import { getUser } from "./api/user";
 
 function App() {
@@ -67,7 +68,7 @@ function App() {
     const timeout = setTimeout(() => {
       console.warn("Image preloading timed out.");
       setImagesLoaded(true);
-    }, 5000);
+    }, 10000);
 
     imagesToPreload.forEach((src) => {
       const img = new Image();
@@ -209,6 +210,16 @@ function App() {
               element={
                 user ? (
                   <PersonalChat active={active} setactive={setactive} user={user} setUser={setUser} activePersonalChat={activePersonalChat} setActivePersonalChat={setActivePersonalChat}/>
+                ) : (
+                  <Navigate to="/auth" />
+                )
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                user ? (
+                  <Profile user={user} />
                 ) : (
                   <Navigate to="/auth" />
                 )

@@ -87,11 +87,11 @@ const FindYourPassion = ({ active, setactive }) => {
     <div className="bg-gray-100 pt-4 pb-10">
       {isLoading ? (<Loader text="Loading quiz..."/>) : (
       <>
-      <h1 className="flex justify-center items-center w-full text-4xl mt-10 mb-10 font-bold ">
+      <h1 className="flex justify-center  items-center w-full text-2xl mx-auto text-center md:text-4xl mt-10 mb-10 font-bold ">
         Discover Your Passion: Take the Quiz!
       </h1>
       {/* Quiz Container */}
-      <div className=" mx-auto w-[50rem] h-auto p-6 bg-white border border-gray-300 shadow-lg  rounded-lg mt-4">
+      <div className=" mx-auto w-full md:w-[50rem] h-auto p-6 bg-white border border-gray-300 shadow-lg  rounded-lg mt-4">
         {/* Progress Bar */}
         {!quizComplete && (
           <div className="max-w-lg mx-auto mt-4 transition-all duration-300">

@@ -3,12 +3,21 @@ import SlidingNavbar from "../components/SlidingNavbar";
 import categoryColors from "../assets/contentLibraryColors";
 import { getContent, addContent } from "../api/content";
 import Loader from "../components/Loader";
+import { useNavigate } from "react-router-dom"; // add this
 
 const ContentLibrary = ({ active, setactive }) => {
   const [content, setContent] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [imageError, setimageError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [visibleItems, setVisibleItems] = useState(6);
+
+  const navigate = useNavigate(); // for redirection
+
   useEffect(() => {
     setactive("content library");
+
     const fetchContent = async () => {
       try {
         const data = await getContent();
@@ -16,34 +25,66 @@ const ContentLibrary = ({ active, setactive }) => {
       } catch (err) {
         console.log(err);
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
-  
+
     const token = localStorage.getItem("token");
+
     if (token) {
       fetchContent();
+    } else {
+      navigate("/auth"); // redirect to login
     }
   }, []);
-  
-  
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const filteredContent =
-    selectedCategory === "All"
-      ? content
-      : content.filter((item) => item.category === selectedCategory);
 
-  const [imageError, setimageError] = useState(false)
+  // Reset visible items when category or search changes
+  useEffect(() => {
+    setVisibleItems(6);
+  }, [selectedCategory, searchQuery]);
+  
+  // Filter by category and search query
+  const filteredContent = content
+    .filter(item => selectedCategory === "All" || item.category === selectedCategory)
+    .filter(item => {
+      if (!searchQuery.trim()) return true;
+      
+      const query = searchQuery.toLowerCase();
+      return (
+        item.title?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query) ||
+        item.category?.toLowerCase().includes(query)
+      );
+    });
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleShowMore = () => {
+    setVisibleItems(prevVisible => prevVisible + 6);
+  };
+
+  // Limit the displayed items
+  const displayedContent = filteredContent.slice(0, visibleItems);
+  const hasMoreItems = visibleItems < filteredContent.length;
+
   return (
-    <div className=" relative bg-gray-100">
+    <div className="relative bg-gray-100 min-h-screen pb-16">
       
       {isLoading ? (<Loader text="Loading content..."/>) : (<>
         <div className="flex">
         
-        <div className="flex flex-col mt-5 w-full px-10">
+        <div className="flex flex-col mt-5 w-full px-5 md:px-10">
         <h1 className="text-3xl text-emerald-500 font-bold ">Content Library</h1>
         <span className="text-black font-medium">Welcome to the Content Library, your go-to hub for insightful articles, guides, and resources.</span>
-        <input type="text" placeholder="Search" className="w-1/2 mt-10 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        <input 
+          type="text" 
+          placeholder="Search" 
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="md:w-1/2 w-full mt-10 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500" 
+        />
           <SlidingNavbar
           sections={[
             "All",
@@ -59,8 +100,8 @@ const ContentLibrary = ({ active, setactive }) => {
      
       
       <div className="grid mx-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-        {filteredContent.length > 0 ? (
-          filteredContent.map((item, index) => (
+        {displayedContent.length > 0 ? (
+          displayedContent.map((item, index) => (
             <div
               key={index}
               className={`hover:shadow-lg rounded-md overflow-hidden relative bg-white `}
@@ -100,9 +141,26 @@ const ContentLibrary = ({ active, setactive }) => {
           ))
         ) : (
           <p className="text-center text-gray-500 col-span-full">
-            No content available in this category.
+            No content found matching your search.
           </p>
         )}
+      </div>
+
+      {/* Show More button */}
+      {hasMoreItems && (
+        <div className="flex justify-center mt-10">
+          <button 
+            onClick={handleShowMore} 
+            className="bg-emerald-500 hover:bg-black text-white px-8 py-2 rounded-full transition-all duration-300"
+          >
+            Show More
+          </button>
+        </div>
+      )}
+
+      {/* Display count */}
+      <div className="text-center text-gray-500 mt-4">
+        Showing {Math.min(visibleItems, filteredContent.length)} of {filteredContent.length} items
       </div>
       </>)} 
       

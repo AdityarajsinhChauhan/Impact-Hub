@@ -1,0 +1,33 @@
+/* Custom styles for leaflet map */
+
+/* Make popup wider and add some styling */
+.leaflet-popup-content {
+  min-width: 200px;
+  margin: 8px 12px;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  padding: 0;
+}
+
+.leaflet-popup-tip {
+  background-color: white;
+}
+
+/* Add a faint shadow to the map container */
+.leaflet-container {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Style the marker icon */
+.leaflet-marker-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* Style the attribution text */
+.leaflet-control-attribution {
+  font-size: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0 5px;
+} 

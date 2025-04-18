@@ -29,33 +29,38 @@ const CommunityChat = ({
     setactive("community & chat");
   }, []);
 
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setactive("community & chat");
-  
+
       const nameMap = {};
-  
+
       try {
         // Fetch all discussions
         const discussionsResponse = await getDiscussions();
         setAllDiscussions(discussionsResponse);
-  
+
         // Fetch personal chats
         if (user?.email) {
           const res = await axios.get(`/personalChat/${user.email}`);
           setConversations(res.data);
-  
+
           await Promise.all(
             res.data.map(async (chat) => {
-              const otherEmail = chat.participants.find(p => p !== user.email);
+              const otherEmail = chat.participants.find(
+                (p) => p !== user.email
+              );
               if (otherEmail && !nameMap[otherEmail]) {
                 try {
                   const userData = await getUserByEmail(otherEmail);
                   nameMap[otherEmail] = userData.name || otherEmail;
                 } catch (err) {
-                  console.error("Error fetching user for email:", otherEmail, err);
+                  console.error(
+                    "Error fetching user for email:",
+                    otherEmail,
+                    err
+                  );
                   nameMap[otherEmail] = otherEmail;
                 }
               }
@@ -63,17 +68,16 @@ const CommunityChat = ({
           );
           setUserNameMap({ ...nameMap });
         }
-  
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     fetchData();
   }, [user, showDiscussionForm]);
-  
+
   return (
     <div>
       {showDiscussionForm && (
@@ -83,107 +87,111 @@ const CommunityChat = ({
         />
       )}
 
-      {isLoading ? (<Loader text="Loading community chat..."/>) : (
-      <>
-      <header className="relative w-screen mt-8 h-fit">
-        <div className="absolute left-5 right-5 h-64 overflow-hidden rounded-2xl">
-          <img
-            src="/ui-images/chat.jpg"
-            alt="chat background"
-            className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-300 brightness-75"
-          />
-        </div>
-        <div className="absolute top-10 left-16 text-4xl text-white font-bold">
-          Community & Chat
-        </div>
-        <div className="absolute top-24 left-16 text-white text-xl w-1/2">
-          Connect with like-minded individuals, join discussions and collaborate
-          on projects that make a difference.
-        </div>
-        <button
-          onClick={() => setShowDiscussionForm(true)}
-          className="absolute top-44 left-16 bg-emerald-500 text-white rounded-md px-4 py-2"
-        >
-          Start New Discussion
-        </button>
-      </header>
-
-      <div className="flex mx-5 pt-64">
-        <div className="w-2/3 mt-10">
-          <h1 className="text-2xl font-medium">Active Discussions</h1>
-          <div className="border border-gray-200 flex flex-col gap-5 rounded-lg mt-5 p-5">
-            {/*discussion list*/}
-            {allDiscussions.map((discussion) => (
-              <div className="border border-gray-200 rounded-lg flex p-3 ">
-                <div className="w-5/6 flex">
-                  <div className="flex flex-col ">
-                    <div className="text-lg font-medium px-2">
-                      {discussion.title}
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex gap-1 flex-wrap">
-                        {discussion.tags?.map((tag, i) => (
-                          <span
-                            key={i}
-                            className="text-xs bg-gray-200 w-fit rounded-full px-2"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      <span className="text-sm text-gray-500 m-1 truncate max-w-xs px-2">
-                        {discussion.description}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-1/6 text-emerald-500 flex items-center justify-center">
-                  <Link
-                    to={`/chat/${discussion._id}`}
-                    className="px-3 py-1 hover:bg-gray-100 rounded-md transition-all duration-300 cursor-pointer"
-                  >
-                    View -&gt;
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="w-1/3 mt-10 ml-5">
-          <h1 className="text-2xl font-medium">Recent chats</h1>
-          <div className="border border-gray-200 mt-5 rounded-lg p-5 flex flex-col gap-5">
-            {/* profile */}
-            {conversations.map((chat) => {
-              const other = chat.participants.find((p) => p !== user.email);
-              return (
-                <div
-                  onClick={() => {
-                    setActivePersonalChat(chat._id);
-                    navigate("/personal-chat");
-                  }}
-                  key={chat._id}
-                  className="flex gap-5 hover:bg-gray-100 transition-all duration-300 cursor-pointer rounded-lg py-1 px-3"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gray-200 my-auto"></div>
-                  <div className="flex flex-col">
-                    <span>{userNameMap[other]}</span>
-                    <span className="text-gray-500 text-sm">Last message</span>
-                  </div>
-                </div>
-              );
-            })}
-
+      {isLoading ? (
+        <Loader text="Loading community chat..." />
+      ) : (
+        <>
+          <header className="relative w-screen mt-8 h-fit">
+            <div className="absolute left-5 right-5 h-64 overflow-hidden rounded-2xl">
+              <img
+                src="/ui-images/chat.jpg"
+                alt="chat background"
+                className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-300 brightness-75"
+              />
+            </div>
+            <div className="absolute top-5 md:top-10 left-12 md:left-16 text-2xl md:text-4xl text-white font-bold">
+              Community & Chat
+            </div>
+            <div className="absolute md:top-24 top-16 left-12 md:left-16 text-white text-sm md:text-xl md:w-1/2 w-[80%]">
+              Connect with like-minded individuals, join discussions and
+              collaborate on projects that make a difference.
+            </div>
             <button
-              onClick={() => navigate("/personal-chat")}
-              className="bg-emerald-500 font-medium text-white rounded-md px-4 py-2 hover:bg-black transition-all duration-300"
+              onClick={() => setShowDiscussionForm(true)}
+              className="absolute md:top-44 top-36 left-12 md:left-16 bg-emerald-500 text-white rounded-md px-4 py-2"
             >
-              Go to Chat
+              Start New Discussion
             </button>
+          </header>
+
+          <div className="flex md:flex-row flex-col mx-5 pt-64 mb-5">
+            <div className="md:w-2/3 w-full mt-10">
+              <h1 className="text-2xl font-medium">Active Discussions</h1>
+              <div className="border border-gray-200 flex flex-col gap-5 rounded-lg mt-5 p-5 md:min-h-[50vh] h-[40vh] overflow-y-scroll">
+                {/*discussion list*/}
+                {allDiscussions.map((discussion) => (
+                  <div className="border border-gray-200 rounded-lg flex p-3 ">
+                    <div className="w-5/6 flex">
+                      <div className="flex flex-col ">
+                        <div className="text-lg font-medium px-2">
+                          {discussion.title}
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <div className="flex gap-1 flex-wrap">
+                            {discussion.tags?.map((tag, i) => (
+                              <span
+                                key={i}
+                                className="text-xs bg-gray-200 w-fit rounded-full px-2"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+
+                          <span className="text-sm text-gray-500 m-1 truncate max-w-[15rem] md:max-w-xs px-2 overflow-hidden">
+                            {discussion.description}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-1/6 text-emerald-500 flex items-center justify-center">
+                      <Link
+                        to={`/chat/${discussion._id}`}
+                        className="px-3 py-1 hover:bg-gray-100 rounded-md transition-all duration-300 cursor-pointer"
+                      >
+                        View <span className="md:inline hidden"> -&gt;</span>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:w-1/3 w-full mt-10 md:ml-5">
+              <h1 className="text-2xl font-medium">Recent chats</h1>
+              <div className="border border-gray-200 mt-5 rounded-lg p-5 flex flex-col gap-5 md:min-h-[50vh] h-[40vh] md:overflow-visible overflow-y-scroll">
+                {/* profile */}
+                {conversations.map((chat) => {
+                  const other = chat.participants.find((p) => p !== user.email);
+                  return (
+                    <div
+                      onClick={() => {
+                        setActivePersonalChat(chat._id);
+                        navigate("/personal-chat");
+                      }}
+                      key={chat._id}
+                      className="flex gap-5 hover:bg-gray-100 transition-all duration-300 cursor-pointer rounded-lg py-1 px-3"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gray-200 my-auto"></div>
+                      <div className="flex flex-col">
+                        <span>{userNameMap[other]}</span>
+                        <span className="text-gray-500 text-sm">
+                          Last message
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={() => navigate("/personal-chat")}
+                  className="bg-emerald-500 font-medium text-white rounded-md px-4 py-2 hover:bg-black transition-all duration-300"
+                >
+                  Go to Chat
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      </>
+        </>
       )}
     </div>
 

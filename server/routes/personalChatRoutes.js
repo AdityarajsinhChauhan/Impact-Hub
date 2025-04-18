@@ -24,7 +24,6 @@ router.get('/:email', async (req, res) => {
 router.get('/chat/:id', async (req, res) => {
   const chat = await PersonalChat.findById(req.params.id);
   res.json(chat);
-  console.log(chat);
 });
 
 export default router;

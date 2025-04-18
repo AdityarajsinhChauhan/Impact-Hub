@@ -30,6 +30,11 @@ export const navLinks = [
       label: "community & chat",
       to: "/community-chat",
       key: "community & chat"
+    },
+    {
+      label: "profile",
+      to: "/profile",
+      key: "profile"
     }
   ];
   

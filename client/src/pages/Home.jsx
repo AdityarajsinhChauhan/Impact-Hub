@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import HomeImgData from "../assets/HomeImgData";
 import { FeaturesData } from "../assets/FeaturesData";
@@ -8,8 +8,8 @@ const Home = ({ active, setactive }) => {
 
   const navigate = useNavigate();
   const [isPageLoaded, setIsPageLoaded] = useState(false);
-
   const [visible, setVisible] = useState(false);
+  const featuresRef = useRef(null);
 
   const { ref, inView } = useInView({
     triggerOnce: true,
@@ -25,15 +25,22 @@ const Home = ({ active, setactive }) => {
     setIsPageLoaded(true);
   }, []);
 
+  const scrollToFeatures = () => {
+    featuresRef.current.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
   return (
     <div className="bg-gray-100">
 
 
       {/* first hero image */}
-      <div className="relative h-[100vh] overflow-hidden">
+      <div className="relative  h-[50vh] md:h-[89vh] overflow-hidden">
         <img
           src={HomeImgData[0].image}
-          className={`brightness-50 transition-all duration-500 object-cover object-bottom w-[100vw] h-[100vh] md:h-[88vh]
+          className={`brightness-50 transition-all duration-500 object-cover object-bottom w-[100vw] h-[50vh] md:h-[89vh]
             ${isPageLoaded ? "opacity-100" : "opacity-0"}
             `}
         />
@@ -51,6 +58,7 @@ const Home = ({ active, setactive }) => {
               </div>
             </div>
             <button
+              onClick={scrollToFeatures}
               className={`text-white text-xl font-medium bg-emerald-500 px-10 py-3 rounded-full hover:bg-black
                 transition-all duration-500 ${
                   isPageLoaded
@@ -65,10 +73,12 @@ const Home = ({ active, setactive }) => {
         <span className="absolute text-white bottom-36 right-5">
           {HomeImgData[0].photoBy}
         </span>
+
+        <div className=" absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-100 to-transparent pointer-events-none z-10" />
         
       </div>
       {/* White fade effect at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-100 to-transparent pointer-events-none z-10" />
+      
       
 
 
@@ -78,7 +88,7 @@ const Home = ({ active, setactive }) => {
 
       {/*what impact hub offers section*/}
 
-      <div className="flex justify-center items-center text-5xl font-thin mt-14">
+      <div ref={featuresRef} className="flex justify-center items-center text-4xl md:text-5xl font-thin mt-14 pt-5 scroll-mt-5">
         What Impact Hub Offers
       </div>
 
@@ -87,12 +97,12 @@ const Home = ({ active, setactive }) => {
           return (
             <div className="flex flex-col mt-28">
               {item.id % 2 == 0 ? (
-                <div className="flex rounded-lg mx-16 bg-white p-10 ">
-                  <div className="relative w-[60rem] h-[20rem] overflow-hidden">
+                <div className="flex flex-col md:flex-row md:rounded-lg w-screen md:w-[90vw] md:mx-16 bg-white md:p-10 mb-5 ">
+                  <div className="relative w-[90vw] md:w-[60rem] h-[20rem] overflow-hidden md:m-0 m-5">
                     <img
                       src={item.image}
                       alt=""
-                      className=" w-[60rem] h-[20rem] rounded-lg object-cover object-center mr-16 brightness-75 hover:scale-110 transition-all duration-300"
+                      className=" w-[90vw] md:w-[60rem] h-[20rem] rounded-lg object-cover object-center md:mr-16 brightness-75 hover:scale-110 transition-all duration-300"
                     />
                     <span className="absolute bottom-5 right-5 text-white">
                       {item.imageBy}
@@ -101,32 +111,32 @@ const Home = ({ active, setactive }) => {
                       {item.quote}
                     </span>
                   </div>
-                  <div className="flex flex-col ml-16 w-[60rem]">
-                    <h1 className="text-4xl font-thin text-emerald-700 mb-8">
+                  <div className="flex flex-col  w-[90vw] md:w-[60rem]">
+                    <h1 className="text-4xl mx-0 md:mx-10 font-thin text-emerald-700 flex md:block justify-center items-center mb-8">
                       {item.title}
                     </h1>
-                    <span className="text-lg">{item.description}</span>
-                    <button onClick={() => navigate(item.link)} className="w-48 rounded-lg bg-black text-white mt-10 py-2 text-lg hover:bg-emerald-500 transition-all duration-500">
+                    <span className="text-lg mx-10">{item.description}</span>
+                    <button onClick={() => navigate(item.link)} className="md:w-48 w-full md:mx-10 mx-5  rounded-lg bg-black text-white mt-10 py-2 text-lg hover:bg-emerald-500 transition-all duration-500">
                       {item.buttonText}
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex mx-16 bg-white p-10 rounded-lg">
-                  <div className="flex flex-col mr-16 w-[60rem]">
-                    <h1 className="text-4xl font-thin text-emerald-700 mb-8">
+                <div className="flex flex-col md:w-[90vw] w-screen md:flex-row md:mx-16 bg-white md:p-10 md:rounded-lg">
+                  <div className="flex flex-col mr-16 w-[90vw] md:w-[60rem]">
+                    <h1 className="text-4xl flex md:block justify-center items-center mt-5 mx-0 md:mx-10 font-thin text-emerald-700 mb-8">
                       {item.title}
                     </h1>
-                    <span className="text-lg">{item.description}</span>
-                    <button onClick={() => navigate(item.link)} className="w-48 rounded-lg bg-emerald-500 text-white mt-10 py-2 text-lg hover:bg-black transition-all duration-500">
+                    <span className="text-lg mx-10">{item.description}</span>
+                    <button onClick={() => navigate(item.link)} className="md:w-48 w-full md:mx-10 mx-5 rounded-lg bg-emerald-500 text-white mt-10 py-2 text-lg hover:bg-black transition-all duration-500">
                       {item.buttonText}
                     </button>
                   </div>
-                  <div className="relative w-[60rem] h-[20rem] overflow-hidden rounded-lg">
+                  <div className="relative w-[90vw] md:w-[60rem] h-[20rem] overflow-hidden rounded-lg md:m-0 m-5">
                     <img
                       src={item.image}
                       alt=""
-                      className=" w-[60rem] h-[20rem] object-cover object-center brightness-75 hover:scale-110 transition-all duration-300"
+                      className=" w-[90vw] md:w-[60rem] h-[20rem] object-cover object-center brightness-75 hover:scale-110 transition-all duration-300"
                     />
                     <span className="absolute bottom-5 right-5 text-white">
                       {item.imageBy}
@@ -141,7 +151,7 @@ const Home = ({ active, setactive }) => {
                
                <>
                {/* second image */}
-               <div className="relative h-[90vh] overflow-hidden mt-28">
+               <div className="relative md:h-[90vh] h-[50vh] overflow-hidden mt-28">
                  <img
                    src={HomeImgData[1].image}
                    alt=""
@@ -181,7 +191,7 @@ const Home = ({ active, setactive }) => {
                  <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gray-100 to-transparent"></div>
              
                  {/* Bottom fade */}
-                 <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-100 to-transparent"></div>
+                 <div className="absolute bottom-0  left-0 w-full h-32 bg-gradient-to-t from-gray-100 to-transparent"></div>
                </div>
              </>
              

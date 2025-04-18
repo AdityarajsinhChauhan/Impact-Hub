@@ -9,7 +9,9 @@ const userSchema = new mongoose.Schema({
   location: {
     latitude: { type: Number },
     longitude: { type: Number }
-  }
+  },
+  bio: { type: String, default: '' },
+  interests: { type: [String], default: [] }
 });
 
 export default mongoose.model('User', userSchema);

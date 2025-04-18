@@ -1,47 +1,68 @@
-import React , {useState, useRef, useEffect} from 'react'
+import React, { useState, useRef, useEffect } from "react";
 
 const SlidingNavbar = ({ sections, activeSection, onSelect }) => {
-    const [activeIndex, setActiveIndex] = useState(0);
   const navRef = useRef(null);
   const indicatorRef = useRef(null);
-  const [selectedIndex, setSelectedIndex] = useState(
+  const tabRefs = useRef([]);
+
+  const [activeIndex, setActiveIndex] = useState(
     sections.indexOf(activeSection) || 0
   );
 
   const handleClick = (index, section) => {
-    setSelectedIndex(index);
-    onSelect(section); // Update parent state
+    setActiveIndex(index);
+    onSelect(section);
+
+    tabRefs.current[index]?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
   };
 
   useEffect(() => {
-    if (navRef.current && indicatorRef.current) {
-      const activeTab = navRef.current.children[activeIndex];
-      indicatorRef.current.style.width = `${activeTab.offsetWidth}px`;
-      indicatorRef.current.style.left = `${activeTab.offsetLeft}px`;
+    const activeTab = tabRefs.current[activeIndex];
+    const nav = navRef.current;
+    const indicator = indicatorRef.current;
+
+    if (activeTab && nav && indicator) {
+      const tabRect = activeTab.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+
+      indicator.style.width = `${tabRect.width}px`;
+      indicator.style.left = `${activeTab.offsetLeft - nav.scrollLeft}px`;
     }
   }, [activeIndex, sections]);
-  return (
-    <div className="relative w-full border border-gray-500 pr-4 py-2 bg-white rounded-md  overflow-hidden h-12 mt-5">
-        <div ref={navRef} className="flex justify-center relative space-x-1">
-        {sections.map((section, index) => (
-          <button
-            key={index}
-            onClick={() => {
-                setActiveIndex(index);
-                handleClick(index, section)}}
-            className={`relative transition-all duration-300  z-10 px-6 py-1 text font-medium ${activeIndex === index ? 'text-white hover:text-white' : 'text-gray-500 hover:text-emerald-500'}`}
-          >
-            {section}
-          </button>
-        ))}
-        <div
-          ref={indicatorRef}
-          className="absolute bottom-0 top-0 bg-emerald-500 rounded-md transition-all duration-300"
-        ></div>
-      </div>
-      
-    </div>
-  )
-}
 
-export default SlidingNavbar
+  return (
+    <div className="relative w-full py-1 bg-white rounded-md border border-gray-300 overflow-x-auto h-12 mt-5">
+      <div className="w-full flex justify-center">
+        <div
+          ref={navRef}
+          className="flex relative space-x-2 px-4 w-max"
+        >
+          {sections.map((section, index) => (
+            <button
+              key={index}
+              ref={(el) => (tabRefs.current[index] = el)}
+              onClick={() => handleClick(index, section)}
+              className={`transition-all whitespace-nowrap text-sm font-medium relative z-10 px-4 py-2 rounded-md ${
+                activeIndex === index
+                  ? "text-white"
+                  : "text-gray-600 hover:text-emerald-500"
+              }`}
+            >
+              {section}
+            </button>
+          ))}
+          <div
+            ref={indicatorRef}
+            className="absolute bg-emerald-500 h-8 rounded-md top-1 transition-all duration-300 z-0"
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SlidingNavbar;
